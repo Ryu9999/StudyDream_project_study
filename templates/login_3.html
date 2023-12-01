@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>스터디 드림 로그인</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+        .input_text {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+            border-radius: 5px;
+        }
+        /* 추가된 스타일 */
+        .wide-btn {
+            width: 100%; /* 버튼을 100% 너비로 설정 */
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container mt-5">
+        <div class="card mx-auto" style="max-width: 800px;">
+            <div class="card-body text-center">
+                <h3 class="mb-4">스터디 드림, 당신의 꿈을 공부하세요</h3>
+                <h4 class="mb-4">RAW SQL 방식 사용 로그인</h4>
+                <form id="login-form">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <!-- 각각의 input을 별도의 div로 감싸서 나란히 표시 -->
+                        <div class="row">
+                            <div class="col">
+                                <input type="text" id="id" name="id" placeholder="아이디" title="아이디" class="input_text" maxlength="41" value="">
+                                <input type="password" id="password" name="password" placeholder="비밀번호" title="비밀번호" class="input_text" maxlength="41" value="">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 클래스 추가 -->
+                    <button type="button" class="btn btn-primary wide-btn" onclick="login_3()">Login</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script>
+                function login_3() {
+            var username = $('#id').val();
+            var password = $('#password').val();
+            var csrf_token = $('input[name=csrfmiddlewaretoken]').val();
+
+            $.ajax({
+                type: 'POST',
+                url: '{% url "login_3" %}',
+                data: {
+                    'username': username,
+                    'password': password,
+                    'csrfmiddlewaretoken': csrf_token,
+                },
+                headers: {
+                 'X-CSRFToken': csrf_token,
+                },
+                success: function(response) {
+                    if (response.status === 'success') {
+                        window.location.href = '/list_page/';
+                    } else {
+                        console.log('Login failed');
+                    }
+                },
+                error: function(error) {
+                    window.location.href = '/error/';
+                    // 실패 시 처리
+                }
+            });
+        }
+
+    </script>
+</body>
+</html>

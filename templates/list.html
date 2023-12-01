@@ -1,0 +1,66 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>게시판 - 목록</title>
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}" />
+</head>
+<body>
+
+<header>
+    <nav class="navbar navbar-dark bg-dark shadow-sm mb-3">
+        <div class="container d-flex justify-content-between">
+            <a href="/" class="navbar-brand d-flex align-items-center">
+                <strong>게시판</strong>
+            </a>
+        </div>
+    </nav>
+</header>
+
+<div class="container">
+    <h2 class="mb-3">게시판 목록</h2> <!-- 제목 수정 -->
+
+    <table class="table">
+        <thead class="thead-light">
+        <tr class="text-center">
+            <th scope="col">#</th>
+            <th scope="col">제목</th>
+            <th scope="col">작성자</th>
+            <th scope="col">작성일</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for board in boards %}
+        <tr class="text-center">
+            <th scope="row">
+                <span>{{ board.id }}</span>
+            </th>
+            <td>
+                <a href="/post/{{ board.id }}">
+                    <span>{{ board.title }}</span>
+                </a>
+            </td>
+            <td>
+                <span>{{ board.author }}</span>
+            </td>
+            <td>
+                <span>{{ board.created_date | date:"Y-m-d h:i" }}</span>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="row">
+        <div class="col-auto mr-auto"></div>
+        <div class="col-auto">
+            <a class="btn btn-primary" href="/write_post" role="button">스터디 기록하기</a>
+            <a class="btn btn-secondary" href="{% url 'logout' %}" role="button">로그아웃</a>
+            <a class="btn btn-warning" href="{% url 'search' %}" role="button">검색하기</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

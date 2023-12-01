@@ -1,0 +1,109 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <title>게시판 - 목록</title>
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}" />
+    <style>
+        body {
+            padding: 20px;
+            background-color: #f8f9fa;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 5000px;
+            margin: auto;
+            text-align: center; /* 가운데 정렬을 위해 추가 */
+        }
+
+        .search-form {
+            margin-bottom: 20px;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: inline-block; /* 중앙 정렬을 위해 추가 */
+        }
+
+        .search-form select,
+        .search-form input,
+        .search-form button {
+            margin-bottom: 10px;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+
+        .error-message {
+            color: red;
+        }
+
+        .results-list {
+            list-style-type: none;
+            padding: 0;
+            display: inline-block; /* 중앙 정렬을 위해 추가 */
+        }
+
+        .results-list li {
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            padding: 10px;
+            background-color: #ffffff;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            display: inline-block; /* 중앙 정렬을 위해 추가 */
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2 class="mb-3">목록에서 검색하기</h2>
+
+    <form method="GET" action="{% url 'search' %}" class="search-form">
+        <div class="form-row">
+            <div class="form-group col-md-3">
+                <select name="search_type" class="form-control">
+                    <option value="user" {% if search_type == 'user' %}selected{% endif %}>User</option>
+                    <option value="title" {% if search_type == 'title' %}selected{% endif %}>Title</option>
+                </select>
+            </div>
+            <div class="form-group col-md-6">
+                <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="검색 단어 입력">
+            </div>
+            <div class="form-group col-md-3">
+                <button type="submit" class="btn btn-primary btn-block">검색</button>
+            </div>
+        </div>
+
+        {% if error_message %}
+        <p class="error-message">{{ error_message }}</p>
+        {% endif %}
+        {% if results %}
+        <ul class="results-list col-md-12">
+            {% for result in results %}
+                <li>{{ result.0 }} - {{ result.1 }} - {{ result.2 }} - {{ result.3 }} - {{ result.4 }}</li>
+            {% endfor %}
+        </ul>
+        {% else %}
+            <p>검색 결과가 없습니다.</p>
+        {% endif %}
+
+        <div class="form-group col-md-8">
+            <button type="button" class="btn btn-secondary btn-block" onclick="window.location.href='{% url 'list_page' %}'">목록으로 돌아가기</button>
+        </div>
+    </form>
+</div>
