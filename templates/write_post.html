@@ -20,6 +20,11 @@
       <form action="/write_post" method="post">
         {% csrf_token %}
         <div class="form-group row">
+          <label for="studyScore" class="col-sm-2 col-form-label"><strong>공부 스코어(공부시간)</strong></label>
+<div class="col-sm-10">
+    <input type="text" name="studyScore" class="form-control" id="studyScore" value="{{ record_score }}" readonly />
+    <p>{{ time_difference_str }}동안 공부하셨습니다</p> <!-- 시간 차이 문자열을 추가로 표시 -->
+</div>
           <label for="inputTitle" class="col-sm-2 col-form-label"><strong>제목</strong></label>
           <div class="col-sm-10">
             <input type="text" name="title" class="form-control" id="inputTitle" />
@@ -42,9 +47,11 @@
           <div class="col-auto">
             <input class="btn btn-primary" type="submit" role="button" value="글쓰기" />
           </div>
+          <div class="col-auto">
+            <button type="button" class="btn btn-secondary btn-block" onclick="window.location.href='{% url 'list_page' %}'">목록으로 돌아가기</button>
+          </div>
         </div>
       </form>
     </div>
-    <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
   </body>
 </html>

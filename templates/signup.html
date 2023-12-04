@@ -1,22 +1,83 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="wrapper" style="text-align: center;">
+
+<style>
+    body {
+        font-family: 'Arial', sans-serif;
+        background-color: #f8f9fa;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+    }
+
+    form {
+        background-color: #ffffff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        width: 300px;
+        text-align: center;
+    }
+
+    h1 {
+        color: #343a40;
+    }
+
+    label {
+        display: block;
+        margin-top: 10px;
+        margin-bottom: 8px;
+        color: #495057;
+    }
+
+    input {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 16px;
+        box-sizing: border-box;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+    }
+
+    button {
+        background-color: #007bff;
+        color: #ffffff;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    button:hover {
+        background-color: #0056b3;
+    }
+</style>
+
+<div>
     <h1>회원가입</h1>
-    <form method="POST">
+    <form method="post" action="{% url 'signup' %}">
         {% csrf_token %}
-        아이디: <br>
-        <input name="username" type="text">
-        <br>
-        비밀번호: <br>
-        <input name="password1" type="password">
-        <br>
-        비밀번호 확인: <br>
-        <input name="password2" type="password">
-        <br>
-        이메일: <br>
-        <input name="email" type="email">
-        <br><br>
-        <input type="submit" class="btn btn-primary" value="Sign Up">
+        <div>
+            <label for="username">아이디</label>
+            <input type="text" name="username" id="username" required>
+        </div>
+        <div>
+            <label for="password1">비밀번호</label>
+            <input type="password" name="password1" id="password1" required>
+        </div>
+        <div>
+            <label for="password2">비밀번호 확인</label>
+            <input type="password" name="password2" id="password2" required>
+        </div>
+        <div>
+            <label for="email">이메일</label>
+            <input type="email" name="email" id="email" required>
+        </div>
+        <button type="submit">가입하기</button>
     </form>
 </div>
+
 {% endblock %}

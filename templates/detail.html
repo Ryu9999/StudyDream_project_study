@@ -1,54 +1,53 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="ko">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <title>게시판 - {{ board.title }}</title>
     <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}" />
-  </head>
-  <body>
-    <header>
-      <div class="navbar navbar-dark bg-dark shadow-sm mb-3">
+</head>
+<body>
+<header>
+    <div class="navbar navbar-dark bg-dark shadow-sm mb-3">
         <div class="container d-flex justify-content-between">
-          <a href="/" class="navbar-brand d-flex align-items-center">
-            <strong>게시판</strong>
-          </a>
+            <a href="/" class="navbar-brand d-flex align-items-center">
+                <strong>게시판</strong>
+            </a>
         </div>
-      </div>
-    </header>
-    <div class="container">
-      <div class="card">
+    </div>
+</header>
+<div class="container">
+    <div class="card">
         <div class="card-body">
-          <h5 class="card-title">{{ board.title }} - {{ board.author }}</h5>
-          <p class="card-text">
-            <small class="text-muted">{{ board.created_date | date:"Y-m-d h:i" }}</small>
-          </p>
-          <p class="card-text">{{ board.content }}</p>
+            <h5 class="card-title">제목 : {{ board.title }}</h5>
+            <h4 class="card-title">작성자 : {{ board.author }}</h4>
+            <p class="card-text">
+                <small class="text-muted">스터디 기록 일시 : {{ board.created_date | date:"Y-m-d h:i" }}</small>
+                <p class="card-text">공부 스코어 {{ board.record_score }} 점 입니다</p>
+            </p>
+            <p class="card-text">내용 <br>{{ board.content }}</p>
         </div>
-      </div>
-      <div class="row mt-3">
+    </div>
+    <div class="row mt-3">
         <div class="col-auto mr-auto"></div>
         <div class="col-auto">
-          <a class="btn btn-info" href="/post/edit/{{ board.id }}" role="button">수정</a>
+            <button type="button" class="btn btn-secondary btn-block" onclick="window.location.href='{% url 'list_page' %}'">목록으로 돌아가기</button>
         </div>
         <div class="col-auto">
-          <form id="delete-form" action="/post/delete/{{ board.id }}" method="post">
-            <input type="hidden" name="_method" value="delete" />
-            <button id="delete-btn" type="submit" class="btn btn-danger">삭제</button>
-
-            <form method="post" action="{% url 'delete_board' board.id %}/">
-          {% csrf_token %}
-          <div class="form-group">
-            <label for="password">패스워드:</label>
-            <input type="password" class="form-control" id="password" name="password" required>
-          </div>
-          <button type="submit" class="btn btn-danger">삭제</button>
-          <a class="btn btn-secondary" href="{% url 'list_page' %}">취소</a>
-        </form>
-          </form>
+            <a class="btn btn-info" href="/post/edit/{{ board.id }}" role="button">수정</a>
         </div>
-      </div>
+        <div class="col-auto">
+            <form method="post" action="{% url 'delete_board' board.id %}">
+                {% csrf_token %}
+                <div class="form-group text-right">
+                    <input type="password" class="form-control text-center" id="username" name="username" placeholder="아이디" required>
+                    <input type="password" class="form-control text-center" id="password" name="password" placeholder="비밀번호" required>
+                </div>
+                    <p class="text-right">삭제하려면 아이디와 비밀번호를 입력</p>
+                    <button type="submit" class="btn btn-danger">삭제</button>
+            </form>
+        </div>
     </div>
-    <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
-  </body>
+</div>
+</body>
 </html>

@@ -1,0 +1,210 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ping Counter</title>
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}"/>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            color: #333;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+             width: auto;
+        }
+
+        #pingForm {
+            width: 70%; /* Adjust the width as needed */
+            max-width: 400px; /* Set a maximum width if desired */
+            margin: 20px auto; /* Center the form horizontally */
+        }
+
+        #pingForm .form-group {
+            margin-bottom: 15px;
+        }
+
+        #pingForm .form-group label {
+            color: #333;
+        }
+
+        #pingForm .form-control {
+            border: 1px solid #ccc;
+        }
+
+        #pingForm .button-group {
+            margin-top: 20px;
+        }
+
+        #pingForm .button-group button {
+            margin-right: 10px;
+        }
+
+        .response-box {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 20px auto; /* Center the response-box horizontally */
+            max-width: 800px ; /* Set a maximum width if desired */
+
+        }
+
+        .count_result {
+
+            padding: 10px;
+            margin: 20px auto; /* Center the response-box horizontally */
+            max-width: 400px ; /* Set a maximum width if desired */
+        }
+
+        #pingResult {
+            border: 1px solid #ccc;
+            padding: 10px;
+            white-space: pre-wrap;
+            overflow: auto;
+            margin: 20px auto; /* Center the pingResult horizontally */
+            max-width: 400px; /* Set a maximum width if desired */
+        }
+
+
+        header {
+            background-color: #343a40; /* Dark background color */
+            color: #fff; /* Text color */
+            padding: 10px; /* Add padding for better appearance */
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            justify-content: space-between; /* Align content at both ends */
+        }
+
+        .navbar-brand strong {
+            margin-right: auto; /* Push the strong element to the left */
+        }
+
+        .navbar-brand .row {
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar-brand .col-auto {
+            margin-left: auto; /* Push the column to the right */
+        }
+
+        .navbar-brand .col-auto .btn {
+            margin-left: 5px; /* Add spacing between buttons */
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <nav class="navbar navbar-dark bg-dark shadow-sm mb-3">
+        <div class="container">
+            <a href="/" class="navbar-brand">
+                <strong>Study Dream</strong>
+                <div class="row">
+                    <div class="col-auto">
+                        <a class="btn btn-dark" role="button">안녕하세요, {{ user.username }} 님</a>
+                        <a class="btn btn-secondary" href="{% url 'logout' %}" role="button">로그아웃</a>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </nav>
+</header>
+
+<div class="container">
+    <h3 class="mb-3">공부 시간 카운터</h3>
+    <h11>공부 시작 및 종료 시, 핑을 보내 앱 연결 상태를 확인합니다</h11>
+    <form id="pingForm">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="command">공부 시간 카운트:</label>
+            <input type="text" class="form-control" id="command" name="command" required placeholder="ping -n 3 www.google.com 라고 입력하세요!">
+        </div>
+
+        <div class="button-group">
+            <button type="button" class="btn btn-primary" id="startButton">공부 시작</button>
+            <button type="button" class="btn btn-danger" id="stopButton">공부 종료</button>
+            <button type="button" class="btn btn-warning" id="goRecordButton">공부 기록하기</button>
+        </div>
+    </form>
+
+<div class="response-box">
+    <p id="responseStart">여기에 응답 시작 결과가 표기됩니다</p>
+   </div>
+    <div class="response-box">
+    <p id="responseEnd">여기에 응답 종료 결과가 표기됩니다</p>
+ </div>
+    <div class="count_result">
+       <p>카운트 결과입니다</p>
+    </div>
+    <pre id="pingResult">{{ data.ping_result|linebreaks }}</pre>
+</div>
+
+<script>
+    var start_time;
+    var end_time;
+    function padNumber(number) {
+        return number < 10 ? "0" + number : number;
+    }
+
+    var pingInterval;
+    var isProcessRunning = false;
+    var csrftoken = $("[name=csrfmiddlewaretoken]").val();
+
+    // 클라이언트 코드
+    $("#startButton").click(function() {
+        var command = $("#command").val();
+
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            }
+        });
+
+        $.post("http://localhost:8000/ping_counter", { command: command }, function(data) {
+            var ttlRegex = /TTL=\d+/i;
+            if (data.ping_result.some(line => ttlRegex.test(line))) {
+                start_time = new Date();
+                $("#responseStart").text(`현재 연결되어 있습니다. 공부 시작 시간 : ${start_time.getUTCFullYear()}년${padNumber(start_time.getUTCMonth() + 1)}월${padNumber(start_time.getUTCDate())}일 ${padNumber(start_time.getUTCHours())+9}시${padNumber(start_time.getUTCMinutes())}분${padNumber(start_time.getUTCSeconds())}초`);
+
+            } else {
+                $("#responseStart").text("응답 결과: " + "is Not connected!");
+            }
+            $("#pingResult").html(data.ping_result.join("<br>"));
+        });
+    });
+
+    $("#stopButton").click(function() {
+        var command = $("#command").val();
+
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            }
+        });
+
+        $.post("http://localhost:8000/ping_counter", { command: command }, function(data) {
+            var ttlRegex = /TTL=\d+/i;
+            if (data.ping_result.some(line => ttlRegex.test(line))) {
+                end_time = new Date();
+                $("#responseEnd").text(`현재 연결되어 있습니다. 공부 종료 시간 : ${end_time.getUTCFullYear()}년${padNumber(end_time.getUTCMonth() + 1)}월${padNumber(end_time.getUTCDate())}일 ${padNumber(end_time.getUTCHours())}시${padNumber(end_time.getUTCMinutes())}분${padNumber(end_time.getUTCSeconds())}초`);
+            } else {
+                $("#responseStart").text("응답 결과: " + "is Not connected!");
+            }
+            $("#pingResult").html(data.ping_result.join("<br>"));
+        });
+    });
+
+    $("#goRecordButton").click(function() {
+        window.location.href = `{% url 'write_post' %}?start_time=${start_time.toISOString()}&end_time=${end_time.toISOString()}`;
+    });
+</script>
+</body>
+</html>
