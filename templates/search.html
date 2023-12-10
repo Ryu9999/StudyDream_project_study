@@ -77,11 +77,9 @@
         <div class="form-row">
             <div class="form-group col-md-3">
                 <select name="search_type" class="form-control">
-<option value="user" {% if search_type == 'user' %}selected{% endif %}>작성자</option>
-<option value="title" {% if search_type == 'title' %}selected{% endif %}>제목</option>
-
+                    <option value="user" {% if search_type == 'user' %}selected{% endif %}>작성자</option>
+                    <option value="title" {% if search_type == 'title' %}selected{% endif %}>제목</option>
                 </select>
-
             </div>
             <div class="form-group col-md-6">
                 <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="검색 단어 입력">
@@ -123,3 +121,5 @@
         </div>
     </form>
 </div>
+</body>
+</html>

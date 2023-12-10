@@ -187,7 +187,7 @@ def write_post(request):
             time_difference_str = f'{int(hours)}시간 {int(minutes)}분 {int(seconds)}초'
         else:
             # 3600 미만인 경우 초만 사용하여 포맷팅
-            time_difference_str = f'{int(time_difference_seconds)}초'
+            time_difference_str = f'{int(time_difference_seconds)}점'
 
         # record_score = time_difference_seconds
 
@@ -253,7 +253,7 @@ def ping_counter(request):
                         universal_newlines=True
                     )
                     for line in process.stdout:
-                        ping_result.append(line.strip())
+                        ping_result.append(line.rstrip())
                     process.terminate()  # 프로세스를 종료합니다.
 
                 thread = threading.Thread(target=ping_thread)
