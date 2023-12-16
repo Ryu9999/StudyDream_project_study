@@ -11,7 +11,7 @@
     <div class="navbar navbar-dark bg-dark shadow-sm mb-3">
         <div class="container d-flex justify-content-between">
             <a href="/" class="navbar-brand d-flex align-items-center">
-                <strong>게시판</strong>
+                <strong>개인 스터디 기록 조회</strong>
             </a>
         </div>
     </div>
@@ -23,9 +23,10 @@
             <h4 class="card-title">작성자 : {{ board.author }}</h4>
             <p class="card-text">
                 <small class="text-muted">스터디 기록 일시 : {{ board.created_date | date:"Y-m-d h:i" }}</small>
-                <p class="card-text">공부 스코어 {{ board.record_score }} 점 입니다</p>
+                <p class="card-text">공부 스코어 :  {{ board.record_score }} 입니다</p>
             </p>
-            <p class="card-text">내용 <br>{{ board.content }}</p>
+            <p class="card-text">내용 : {{ board.content }}</p>
+            
         </div>
     </div>
     <div class="row mt-3">

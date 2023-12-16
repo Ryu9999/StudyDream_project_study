@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>게시판 - 목록</title>
     <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}"/>
-
 </head>
 <body>
 
@@ -17,9 +16,15 @@
                 <div class="row">
                     <div class="col-auto mr-auto"></div>
                     <div class="col-auto">
-                        <a class="btn btn-dark" role="button">안녕하세요, {{ user.username }} 님</a>
-                        <a class="btn btn-secondary" href="{% url 'logout' %}" role="button">로그아웃</a>
-
+                        {% if user.is_authenticated %}
+                            <!-- 로그인 상태일 때 -->
+                            <a class="btn btn-dark" role="button">안녕하세요, {{ user.username }} 님</a>
+                            <a class="btn btn-secondary" href="{% url 'logout' %}" role="button">로그아웃</a>
+                        {% else %}
+                            <!-- 비로그인 상태일 때 -->
+                            <a class="btn btn-dark" role="button">반갑습니다! 더 많은 서비스를 이용하기 위해서는 로그인하세요!</a>
+                            <a class="btn btn-info" href="{% url 'login' %}" role="button">로그인하기</a>
+                        {% endif %}
                     </div>
                 </div>
             </a>
@@ -27,14 +32,15 @@
     </nav>
 </header>
 
-
 <div class="container">
-    <h3 class="mb-3">전체 스터디 기록장</h3>
+    <h3 class="mb-3">스터디 기록 목록</h3>
+    <h7 class="mb-13">스터디 내용을 보고 싶다면 검색하기 기능을 사용하거나 로그인 하세요  의견남기기는 로그인 하지 않아도 사용 가능합니다.</h7>
     <div class="row">
         <div class="col-auto mr-auto"></div>
         <div class="col-auto">
             <a class="btn btn-primary" href="/write_post" role="button">스터디 기록하기</a>
             <a class="btn btn-success" href="/ping_counter" role="button">공부 시간 카운터</a>
+            <a class="btn btn-warning" href="{% url 'comment_view' %}" role="button">의견남기기</a>
             <a class="btn btn-warning" href="{% url 'search' %}" role="button">검색하기</a>
         </div>
     </div>
@@ -75,5 +81,6 @@
         </tbody>
     </table>
 </div>
+
 </body>
 </html>

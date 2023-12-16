@@ -5,12 +5,13 @@ from django.http import HttpResponseRedirect, Http404, HttpResponse, JsonRespons
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
-from app_study_dream.models import Board
+from app_study_dream.models import Board, Comment
 from django.db import connection
 from functools import wraps
 from django.contrib.auth.hashers import check_password, make_password
 from django.contrib.auth.models import User
 import subprocess
+from .models import Comment
 from multiprocessing import Process
 
 
@@ -18,13 +19,12 @@ def custom_login_required(view_func):
     @wraps(view_func)
     def wrapper(request, *args, **kwargs):
         if not request.user.is_authenticated:
-            return redirect('login_2')
+            return redirect('login')
         return view_func(request, *args, **kwargs)
 
     return wrapper
 
 
-@custom_login_required
 def list_page(request):
     boards = {'boards': Board.objects.all()}
     return render(request, 'list.html', boards)
@@ -47,33 +47,25 @@ def delete_board(request, board_id):
             return HttpResponseForbidden("패스워드가 일치하지 않습니다.")
     return render(request, 'list.html', {'board': board})
 
-
+@custom_login_required
 def search(request):
     search_input = request.GET.get('q', '')
     search_type = request.GET.get('search_type', 'user')
 
-    if search_input:  # 검색어가 있는지 여부를 확인
-        try:
-            # 검색어가 있다면 사용자 입력된 SQL 쿼리를 실행
-            with connection.cursor() as cursor:
-                if search_type == 'user':
-                    sql_query = f"SELECT * FROM app_study_dream_board WHERE author LIKE %s"
-                    cursor.execute(sql_query, [f"%{search_input}%"])
-                    results = cursor.fetchall()
+    if search_input:
+        with connection.cursor() as cursor:
+            if search_type in ['user', 'title']:
+                field_name = 'author' if search_type == 'user' else 'title'
+                # 주의: 보안상의 이유로 사용자 입력에 대한 검증 없이 raw SQL 사용은 권장되지 않습니다.
+                sql_query = f"SELECT * FROM app_study_dream_board WHERE {field_name} LIKE '%%{search_input}%%'"
+                cursor.execute(sql_query)
+                results = cursor.fetchall()
 
-                elif search_type == 'title':
-                    sql_query = f"SELECT * FROM app_study_dream_board WHERE title LIKE %s"
-                    cursor.execute(sql_query, [f"%{search_input}%"])
-                    results = cursor.fetchall()
+                context = {'results': results, 'search_input': search_input, 'search_type': search_type}
+                return render(request, 'search.html', context)
 
-        except Exception as e:  # 예외가 발생하면(Exception as e), 해당 예외 메시지를 error_message 변수에 저장
-            error_message = str(e)
-            results = None  # results를 None으로 설정
-    else:
-        results = None
-        error_message = None
+    return render(request, 'search.html', {'search_input': search_input, 'search_type': search_type})
 
-    return render(request, 'search.html', {'results': results, 'search_input': search_input})
 
 
 def signup(request):
@@ -150,6 +142,7 @@ def login_view2(request):
 from django.shortcuts import render, HttpResponseRedirect, reverse
 from .models import Board
 
+@custom_login_required
 def write_post(request):
     start_time_str = request.GET.get('start_time')
     end_time_str = request.GET.get('end_time')
@@ -176,23 +169,25 @@ def write_post(request):
         end_time = datetime.fromisoformat(end_time_str)
 
         time_difference = end_time - start_time
-        time_difference_seconds = time_difference.total_seconds()
+        time_difference_minutes = time_difference.total_seconds() / 60
 
+        if time_difference_minutes < 1:
+            time_difference_minutes = 0
         # 초를 시간, 분, 초로 변환
-        hours, remainder = divmod(time_difference_seconds, 3600)
-        minutes, seconds = divmod(remainder, 60)
+        hours, minutes = divmod(time_difference_minutes, 60)
 
-        # time_difference_seconds가 3600 이상인 경우 시, 분, 초로 포맷팅
-        if time_difference_seconds >= 3600:
-            time_difference_str = f'{int(hours)}시간 {int(minutes)}분 {int(seconds)}초'
+        # time_difference_minutes가 60 이상인 경우 시간과 분으로 포맷팅
+        if time_difference_minutes >= 60:
+            time_difference_str = f'{int(hours)}시간 {int(minutes)}분'
         else:
-            # 3600 미만인 경우 초만 사용하여 포맷팅
-            time_difference_str = f'{int(time_difference_seconds)}점'
+            # 60 미만인 경우 분만 사용하여 포맷팅
+            time_difference_str = f'{int(time_difference_minutes)}점'
 
-        # record_score = time_difference_seconds
+        # record_score = time_difference_minutes
 
         # 템플릿에 변수 전달
-        return render(request, 'write_post.html', {'record_score': time_difference_str, 'time_difference_str': time_difference_str})
+        return render(request, 'write_post.html',
+                      {'record_score': time_difference_str, 'time_difference_str': time_difference_str})
 
     else:
         # GET 요청이면서 start_time과 end_time이 없는 경우
@@ -235,6 +230,7 @@ def detail(request, id):
     return render(request, 'detail.html', {'board': board})
 
 @csrf_exempt
+
 def ping_counter(request):
     if request.method == "POST":
         command = request.POST.get('command', '')
@@ -269,3 +265,21 @@ def ping_counter(request):
     return render(request, 'ping_counter.html')
 
 
+
+def comment_view(request):
+    comments = {'comments': Comment.objects.all()}
+    return render(request, 'comment.html', comments)
+
+
+def add_comment(request):
+    if request.method == 'POST':
+        author = request.POST.get('author')
+        text = request.POST.get('text')
+
+        # Comment 테이블에 댓글 추가
+        comment = Comment.objects.create(comments_author=author, comments=text)
+
+        # 댓글 추가 후 댓글이 속한 게시글의 상세 페이지로 리다이렉트
+        return redirect('comment_view')
+
+    return render(request, 'list.html')

@@ -56,7 +56,7 @@
                             </div>
                         </div>
                     </div>
-                    <button type="button" class="btn btn-primary wide-btn" onclick="login_2()">로그인</button>
+                    <button type="button" class="btn btn-primary wide-btn" onclick="login()">로그인</button>
                     <!-- 변경된 부분: 버튼 가로 크기를 줄임 -->
                     <a class="btn btn-warning wide-btn" href="{% url 'signup' %}" role="button">회원가입하기</a>
                 </form>
@@ -67,14 +67,14 @@
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
-        function login_2() {
+        function login() {
             var username = $('#id').val();
             var password = $('#password').val();
             var csrf_token = $('input[name=csrfmiddlewaretoken]').val();
 
             $.ajax({
                 type: 'POST',
-                url: '{% url "login_2" %}',
+                url: '{% url "login" %}',
                 data: {
                     'username': username,
                     'password': password,

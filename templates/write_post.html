@@ -1,57 +1,81 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="ko">
-  <head>
+
+<head>
     <meta charset="UTF-8" />
     <title>게시판 - 글쓰기</title>
     <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}" />
-  </head>
-  <body>
+</head>
+
+<body>
     <header>
-      <div class="navbar navbar-dark bg-dark shadow-sm mb-3">
-        <div class="container d-flex justify-content-between">
-          <a href="/" class="navbar-brand d-flex align-items-center">
-            <strong>게시판</strong>
-          </a>
-        </div>
-      </div>
+        <nav class="navbar navbar-dark bg-dark shadow-sm mb-3">
+            <div class="container d-flex justify-content-between">
+                <a href="/" class="navbar-brand d-flex align-items-center">
+                    <strong>스터디 기록하기</strong>
+                </a>
+                {% if user.is_authenticated %}
+                <!-- 로그인 상태일 때 -->
+                <div class="col-auto">
+                    <a class="btn btn-dark" role="button">안녕하세요, {{ user.username }} 님</a>
+                    <a class="btn btn-secondary" href="{% url 'logout' %}" role="button">로그아웃</a>
+                </div>
+                {% else %}
+                <!-- 비로그인 상태일 때 -->
+                <div class="col-auto">
+                    <a class="btn btn-dark" role="button">반갑습니다! 더 많은 서비스를 이용하기 위해서는 로그인하세요!</a>
+                    <a class="btn btn-info" href="{% url 'login' %}" role="button">로그인하기</a>
+                </div>
+                {% endif %}
+            </div>
+        </nav>
     </header>
+
     <div class="container">
-      <form action="/write_post" method="post">
-        {% csrf_token %}
-        <div class="form-group row">
-          <label for="studyScore" class="col-sm-2 col-form-label"><strong>공부 스코어(공부시간)</strong></label>
-<div class="col-sm-10">
-    <input type="text" name="studyScore" class="form-control" id="studyScore" value="{{ record_score }}" readonly />
-    <p>{{ time_difference_str }}(초)만큼 공부하셨습니다</p>
-</div>
-          <label for="inputTitle" class="col-sm-2 col-form-label"><strong>제목</strong></label>
-          <div class="col-sm-10">
-            <input type="text" name="title" class="form-control" id="inputTitle" />
-          </div>
-        </div>
-        <div class="form-group row">
-          <label for="inputAuthor" class="col-sm-2 col-form-label"><strong>작성자</strong></label>
-          <div class="col-sm-10">
-            <input type="text" name="author" class="form-control" id="inputAuthor" />
-          </div>
-        </div>
-        <div class="form-group row">
-          <label for="inputContent" class="col-sm-2 col-form-label"><strong>내용</strong></label>
-          <div class="col-sm-10">
-            <textarea type="text" name="content" class="form-control" id="inputContent"></textarea>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-auto mr-auto"></div>
-          <div class="col-auto">
-            <input class="btn btn-primary" type="submit" role="button" value="글쓰기" />
-          </div>
-          <div class="col-auto">
-            <button type="button" class="btn btn-secondary btn-block" onclick="window.location.href='{% url 'list_page' %}'">목록으로 돌아가기</button>
-          </div>
-        </div>
-      </form>
+        <form action="/write_post" method="post">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="studyScore"><strong>공부 스코어(공부시간)</strong></label>
+                        <input type="text" name="studyScore" class="form-control" id="studyScore" value="{{ record_score }}" readonly />
+                        <p>{{ time_difference_str }}만큼 공부하셨습니다</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="inputTitle"><strong>제목</strong></label>
+                        <input type="text" name="title" class="form-control" id="inputTitle" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="inputAuthor"><strong>작성자</strong></label>
+                        <input type="text" name="author" class="form-control" id="inputAuthor" />
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="inputContent"><strong>내용</strong></label>
+                        <textarea type="text" name="content" class="form-control" id="inputContent" rows="10"></textarea>
+                  </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 offset-md-6">
+                    <div class="row">
+                        <div class="col-auto">
+                            <input class="btn btn-primary" type="submit" role="button" value="글쓰기" />
+                        </div>
+                        <div class="col-auto">
+                            <button type="button" class="btn btn-secondary btn-block" onclick="window.location.href='{% url 'list_page' %}'">목록으로 돌아가기</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
     </div>
-  </body>
+</body>
+
 </html>
