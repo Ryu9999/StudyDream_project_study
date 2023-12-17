@@ -52,5 +52,5 @@ Bootstrap - Used for styling the application.
 
 This project is licensed under the MIT License.
 
-Ryu Gyoseo
+Ryu Gyoseo,
 Jung Hyeonhwa
